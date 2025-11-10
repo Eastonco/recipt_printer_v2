@@ -1,6 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 const sharp = require('sharp');
+const dither = require('floyd-steinberg');
+const { PNG } = require('pngjs');
 const ThermalPrinter = require('node-thermal-printer').printer;
 const printerConfig = require('./printer-config');
 
@@ -113,14 +115,38 @@ app.post('/print-image', upload.single('image'), async (req, res) => {
 
     // Convert and resize image to fit thermal printer width (384 pixels for 48mm width)
     // Using 384 pixels as it's optimal for most 58mm thermal printers
-    const processedImage = await sharp(req.file.buffer)
+    // Step 1: Resize and convert to grayscale
+    const resizedBuffer = await sharp(req.file.buffer)
       .resize(384, null, {
         fit: 'inside',
         withoutEnlargement: false
       })
-      .grayscale() // Convert to grayscale for better thermal printing
-      .png() // Convert to PNG format
-      .toBuffer();
+      .grayscale()
+      .normalise() // Improve contrast
+      .raw() // Get raw pixel data
+      .toBuffer({ resolveWithObject: true });
+
+    // Step 2: Apply Floyd-Steinberg dithering
+    const { data, info } = resizedBuffer;
+    const png = new PNG({
+      width: info.width,
+      height: info.height
+    });
+
+    // Convert grayscale to RGBA format for floyd-steinberg library
+    for (let i = 0; i < data.length; i++) {
+      const idx = i * 4;
+      png.data[idx] = data[i];     // R
+      png.data[idx + 1] = data[i]; // G
+      png.data[idx + 2] = data[i]; // B
+      png.data[idx + 3] = 255;     // A (fully opaque)
+    }
+
+    // Apply Floyd-Steinberg dithering (modifies png.data in place)
+    dither(png);
+
+    // Step 3: Convert back to PNG buffer
+    const processedImage = PNG.sync.write(png);
 
     const printer = new ThermalPrinter(printerConfig);
 
@@ -150,18 +176,16 @@ app.post('/print-image', upload.single('image'), async (req, res) => {
     // Cut paper
     printer.cut();
 
-    // Execute print
-    await new Promise((resolve, reject) => {
-      printer.execute((err) => {
-        if (err) {
-          console.error('Print error:', err);
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+    // Execute print (don't wait for completion - respond immediately)
+    printer.execute((err) => {
+      if (err) {
+        console.error('Print error:', err);
+      } else {
+        console.log('Image printed successfully');
+      }
     });
 
+    // Respond immediately (don't wait for printing to complete)
     res.json({ success: true, message: 'Image printed successfully' });
   } catch (error) {
     console.error('Image print error:', error);

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(lsusb:*)"
+      "Bash(lsusb:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
