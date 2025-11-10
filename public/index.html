@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Me a Message</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+    }
+
+    h1 {
+      color: #333;
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin: 0 0 30px 0;
+      font-size: 16px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 15px;
+      width: 100%;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .char-count {
+      text-align: right;
+      color: #999;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 24px;
+      cursor: pointer;
+      color: #666;
+      font-size: 15px;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      margin: 0;
+      width: auto;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: #667eea;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .upload-area {
+      border: 3px dashed #e0e0e0;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #fafafa;
+    }
+
+    .upload-area:hover {
+      border-color: #667eea;
+      background: #f5f7ff;
+    }
+
+    .upload-area.dragover {
+      border-color: #667eea;
+      background: #e8ecff;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .upload-area p {
+      margin: 5px 0;
+      color: #666;
+    }
+
+    .upload-hint {
+      font-size: 13px;
+      color: #999;
+    }
+
+    .preview {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .preview-info {
+      margin-top: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>📝 Send Me a Message</h1>
+    <p class="subtitle">Your message will be physically printed out from a recipt printer on my desk</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="text">Text Message</button>
+      <button class="tab-btn" data-tab="image">Send Image</button>
+    </div>
+
+    <div id="text-tab" class="tab-content active">
+      <form id="printForm">
+        <textarea id="textInput" name="text" placeholder="Type your message here..." maxlength="1000"></textarea>
+        <div class="char-count"><span id="charCount">0</span>/1000</div>
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+
+    <div id="image-tab" class="tab-content">
+      <form id="imageForm">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">🖼️</div>
+          <p>Click to select an image or drag and drop</p>
+          <p class="upload-hint">PNG, JPG, GIF (Max 5MB)</p>
+          <input type="file" id="imageInput" accept="image/*" hidden>
+        </div>
+        <div id="preview" class="preview"></div>
+        <button type="submit" id="imageSubmit" style="display:none;">Send Image</button>
+      </form>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const textarea = document.getElementById('textInput');
+    const charCount = document.getElementById('charCount');
+    const resultDiv = document.getElementById('result');
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabName = btn.dataset.tab;
+
+        // Update active states
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+
+        // Clear result when switching tabs
+        resultDiv.style.display = 'none';
+      });
+    });
+
+    // Text message handling
+    function updateCharCount() {
+      charCount.textContent = textarea.value.length;
+    }
+
+    textarea.addEventListener('input', updateCharCount);
+    updateCharCount();
+
+    document.getElementById('printForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const text = textarea.value;
+      const button = e.target.querySelector('button');
+
+      if (!text.trim()) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = 'Please enter a message first!';
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Sending...';
+
+      try {
+        const response = await fetch('/print', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text })
+        });
+
+        const data = await response.json();
+
+        resultDiv.style.display = 'block';
+        if (data.success) {
+          resultDiv.className = 'success';
+          resultDiv.textContent = '✓ Message sent successfully! It will be received shortly.';
+          textarea.value = '';
+          updateCharCount();
+        } else {
+          resultDiv.className = 'error';
+          resultDiv.textContent = '✗ Oops! Something went wrong. Please try again.';
+        }
+      } catch (error) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = '✗ Unable to send message. Please try again later.';
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Send Message';
+      }
+    });
+
+    // Image upload handling
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const imageSubmit = document.getElementById('imageSubmit');
+    let selectedFile = null;
+
+    uploadArea.addEventListener('click', () => imageInput.click());
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleFile(file);
+      }
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        handleFile(file);
+      }
+    });
+
+    function handleFile(file) {
+      if (file.size > 5 * 1024 * 1024) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = 'File is too large. Maximum size is 5MB.';
+        return;
+      }
+
+      selectedFile = file;
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        preview.innerHTML = `
+          <img src="${e.target.result}" alt="Preview">
+          <div class="preview-info">${file.name} (${(file.size / 1024).toFixed(1)} KB)</div>
+        `;
+        imageSubmit.style.display = 'block';
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('imageForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!selectedFile) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = 'Please select an image first!';
+        return;
+      }
+
+      imageSubmit.disabled = true;
+      imageSubmit.textContent = 'Sending...';
+
+      try {
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+
+        const response = await fetch('/print-image', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        resultDiv.style.display = 'block';
+        if (data.success) {
+          resultDiv.className = 'success';
+          resultDiv.textContent = '✓ Image sent successfully! It will be printed shortly.';
+          preview.innerHTML = '';
+          imageSubmit.style.display = 'none';
+          selectedFile = null;
+          imageInput.value = '';
+        } else {
+          resultDiv.className = 'error';
+          resultDiv.textContent = '✗ ' + (data.message || 'Failed to print image.');
+        }
+      } catch (error) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = '✗ Unable to send image. Please try again later.';
+      } finally {
+        imageSubmit.disabled = false;
+        imageSubmit.textContent = 'Send Image';
+      }
+    });
+  </script>
+</body>
+
+</html>
