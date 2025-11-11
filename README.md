@@ -26,20 +26,20 @@ ls -l /dev/usb/lp0
 npm start
 ```
 
-The server will start on `http://localhost:3000` and is accessible via `https://printer.eastonco.net` through a Cloudflare tunnel.
+The server will start on `http://localhost:3000` and can be published to a domain of your choice through a Cloudflare tunnel.
 
 ## Usage
 
 ### Web Interface
 
-Visit `https://printer.eastonco.net` to send a message through the web interface.
+Visit `https://localhost:3000` to send a message through the web interface.
 
 ### API Endpoint
 
 **Print Message**
 
 ```bash
-POST https://printer.eastonco.net/print
+POST https://localhost:3000/print
 Content-Type: application/json
 
 {
@@ -49,14 +49,14 @@ Content-Type: application/json
 
 **Example with curl:**
 ```bash
-curl -X POST https://printer.eastonco.net/print \
+curl -X POST https://localhost:3000/print \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello from the printer!"}'
 ```
 
 **Health Check**
 ```bash
-GET https://printer.eastonco.net/health
+GET https://localhost:3000/health
 ```
 
 ## Configuration
