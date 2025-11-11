@@ -28,6 +28,26 @@ const upload = multer({
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Subdomain-based routing for HTML pages
+app.get('/', (req, res) => {
+  const host = req.get('host') || '';
+
+  // Check if request is from comedy show domain
+  if (host.includes('mystraightfriends.com')) {
+    res.sendFile(__dirname + '/public/comedy.html');
+  }
+  // Check if request is from personal printer domain
+  else if (host.includes('eastonco.net')) {
+    res.sendFile(__dirname + '/public/index.html');
+  }
+  // Default fallback
+  else {
+    res.sendFile(__dirname + '/public/index.html');
+  }
+});
+
+// Serve static files for other assets (CSS, JS, images)
 app.use(express.static('public'));
 
 // Helper function to format and print receipt
