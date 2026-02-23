@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Tools - Receipt Printer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      .container {
+        padding: 25px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    h1 {
+      color: #333;
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin: 0 0 30px 0;
+      font-size: 16px;
+    }
+
+    .control-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .control-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 15px 0;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+    }
+
+    .toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .toggle-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .toggle-description {
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* Toggle switch styles */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 15px;
+    }
+
+    .status-enabled {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-disabled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .info-section {
+      padding: 20px;
+      background: #e8ecff;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-section p {
+      margin: 0;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>⚙️ Admin Tools</h1>
+    <p class="subtitle">Manage receipt printer settings</p>
+
+    <div id="loading" class="loading">Loading current status...</div>
+
+    <div id="controls" style="display: none;">
+      <div class="control-section">
+        <div class="control-header">Receipt Acceptance</div>
+        <div class="toggle-container">
+          <div class="toggle-label">
+            <div class="toggle-title">Enable Receipt Printing</div>
+            <div class="toggle-description">When disabled, all print requests will be rejected</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="acceptanceToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="statusBadge" class="status-badge"></div>
+      </div>
+
+      <div class="info-section">
+        <p><strong>Note:</strong> Disabling receipt acceptance will prevent anyone from sending messages or images to the printer until it's re-enabled.</p>
+      </div>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('acceptanceToggle');
+    const statusBadge = document.getElementById('statusBadge');
+    const resultDiv = document.getElementById('result');
+    const loadingDiv = document.getElementById('loading');
+    const controlsDiv = document.getElementById('controls');
+
+    // Load current status on page load
+    async function loadStatus() {
+      try {
+        const response = await fetch('/admin/status');
+        const data = await response.json();
+
+        toggle.checked = data.enabled;
+        updateStatusBadge(data.enabled);
+
+        loadingDiv.style.display = 'none';
+        controlsDiv.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading status:', error);
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = 'Failed to load current status. Please refresh the page.';
+        loadingDiv.style.display = 'none';
+      }
+    }
+
+    function updateStatusBadge(enabled) {
+      if (enabled) {
+        statusBadge.className = 'status-badge status-enabled';
+        statusBadge.textContent = '✓ Accepting Receipts';
+      } else {
+        statusBadge.className = 'status-badge status-disabled';
+        statusBadge.textContent = '✗ Receipts Disabled';
+      }
+    }
+
+    // Handle toggle change
+    toggle.addEventListener('change', async () => {
+      const enabled = toggle.checked;
+
+      try {
+        const response = await fetch('/admin/toggle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ enabled })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          updateStatusBadge(data.enabled);
+          resultDiv.style.display = 'block';
+          resultDiv.className = 'success';
+          resultDiv.textContent = enabled
+            ? '✓ Receipt acceptance enabled'
+            : '✓ Receipt acceptance disabled';
+
+          // Hide success message after 3 seconds
+          setTimeout(() => {
+            resultDiv.style.display = 'none';
+          }, 3000);
+        } else {
+          resultDiv.style.display = 'block';
+          resultDiv.className = 'error';
+          resultDiv.textContent = '✗ Failed to update setting: ' + data.message;
+          // Revert toggle
+          toggle.checked = !enabled;
+        }
+      } catch (error) {
+        console.error('Error toggling status:', error);
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'error';
+        resultDiv.textContent = '✗ Failed to update setting. Please try again.';
+        // Revert toggle
+        toggle.checked = !enabled;
+      }
+    });
+
+    // Load status when page loads
+    loadStatus();
+  </script>
+</body>
+
+</html>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Send Me a Message</title>
+  <title>My Straight Friends - Live Submissions</title>
   <style>
     * {
       box-sizing: border-box;
@@ -15,7 +15,7 @@
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #e94057 0%, #8a2be2 50%, #ff6b35 100%);
       min-height: 100vh;
       display: flex;
       align-items: flex-start;
@@ -27,8 +27,8 @@
     .container {
       background: white;
       padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(138, 43, 226, 0.4);
       width: 100%;
       margin: auto 0;
     }
@@ -47,22 +47,37 @@
       }
 
       h1 {
-        font-size: 24px;
+        font-size: 26px !important;
+      }
+
+      .subtitle {
+        font-size: 15px !important;
       }
     }
 
     h1 {
-      color: #333;
-      margin: 0 0 10px 0;
-      font-size: 28px;
+      color: #8a2be2;
+      margin: 0 0 8px 0;
+      font-size: 32px;
       text-align: center;
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
 
     .subtitle {
       text-align: center;
+      color: #e94057;
+      margin: 0 0 10px 0;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .tagline {
+      text-align: center;
       color: #666;
       margin: 0 0 30px 0;
-      font-size: 16px;
+      font-size: 14px;
+      font-style: italic;
     }
 
     textarea {
@@ -70,7 +85,7 @@
       min-height: 180px;
       padding: 15px;
       border: 2px solid #e0e0e0;
-      border-radius: 8px;
+      border-radius: 12px;
       font-family: inherit;
       font-size: 15px;
       resize: vertical;
@@ -79,39 +94,47 @@
 
     textarea:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #e94057;
     }
 
     button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #e94057 0%, #8a2be2 50%, #ff6b35 100%);
       color: white;
-      padding: 14px 32px;
+      padding: 15px 32px;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 700;
       margin-top: 15px;
       width: 100%;
       transition: transform 0.2s, box-shadow 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 25px rgba(233, 64, 87, 0.4);
     }
 
     button:active {
       transform: translateY(0);
     }
 
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     #result {
       margin-top: 20px;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 12px;
       display: none;
       text-align: center;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .success {
@@ -142,7 +165,7 @@
     .tab-btn {
       background: #f5f5f5;
       border: none;
-      border-radius: 8px 8px 0 0;
+      border-radius: 12px 12px 0 0;
       padding: 12px 24px;
       cursor: pointer;
       color: #666;
@@ -154,16 +177,16 @@
     }
 
     .tab-btn:hover {
-      background: #e8ecff;
-      color: #667eea;
+      background: #ffe5f0;
+      color: #e94057;
       transform: none;
       box-shadow: none;
     }
 
     .tab-btn.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #e94057 0%, #8a2be2 50%, #ff6b35 100%);
       color: white;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 8px rgba(233, 64, 87, 0.4);
     }
 
     .tab-content {
@@ -176,7 +199,7 @@
 
     .upload-area {
       border: 3px dashed #e0e0e0;
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 40px;
       text-align: center;
       cursor: pointer;
@@ -185,13 +208,13 @@
     }
 
     .upload-area:hover {
-      border-color: #667eea;
-      background: #f5f7ff;
+      border-color: #e94057;
+      background: #fff5f7;
     }
 
     .upload-area.dragover {
-      border-color: #667eea;
-      background: #e8ecff;
+      border-color: #8a2be2;
+      background: #f5f0ff;
     }
 
     .upload-icon {
@@ -217,7 +240,7 @@
     .preview img {
       max-width: 100%;
       max-height: 300px;
-      border-radius: 8px;
+      border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
@@ -226,13 +249,34 @@
       color: #666;
       font-size: 14px;
     }
+
+    .show-logo {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 48px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>📝 Send Me a Message</h1>
-    <p class="subtitle">Your message will be physically printed out from a recipt printer on my desk</p>
+    <div class="show-logo">🎭</div>
+    <h1>My Straight Friends</h1>
+    <p class="subtitle">Live & Anonoymous Audience Submissions</p>
+    <p class="tagline">Send your questions, comments, or memes to the stage!</p>
 
     <div class="tabs">
       <button class="tab-btn active" data-tab="text">Text Message</button>
@@ -241,22 +285,23 @@
 
     <div id="text-tab" class="tab-content active">
       <form id="printForm">
-        <textarea id="textInput" name="text" placeholder="Type your message here..." maxlength="1000"></textarea>
+        <textarea id="textInput" name="text" placeholder="Type your message, question, or comment here..."
+          maxlength="1000"></textarea>
         <div class="char-count"><span id="charCount">0</span>/1000</div>
-        <button type="submit">Send Message</button>
+        <button type="submit">Send to Stage</button>
       </form>
     </div>
 
     <div id="image-tab" class="tab-content">
       <form id="imageForm">
         <div class="upload-area" id="uploadArea">
-          <div class="upload-icon">🖼️</div>
+          <div class="upload-icon">📸</div>
           <p>Click to select an image or drag and drop</p>
           <p class="upload-hint">PNG, JPG, GIF (Max 5MB)</p>
           <input type="file" id="imageInput" accept="image/*" hidden>
         </div>
         <div id="preview" class="preview"></div>
-        <button type="submit" id="imageSubmit" style="display:none;">Send Image</button>
+        <button type="submit" id="imageSubmit" style="display:none;">Send to Stage</button>
       </form>
     </div>
 
@@ -321,9 +366,12 @@
         const data = await response.json();
 
         resultDiv.style.display = 'block';
-        if (data.success) {
+        if (response.status === 403) {
+          resultDiv.className = 'error';
+          resultDiv.textContent = '🚫 Sorry, submissions are not currently being accepted. Please check back later!';
+        } else if (data.success) {
           resultDiv.className = 'success';
-          resultDiv.textContent = '✓ Message sent successfully! It will be received shortly.';
+          resultDiv.textContent = '✓ Sent to the stage! The hosts will see it shortly.';
           textarea.value = '';
           updateCharCount();
         } else {
@@ -336,7 +384,7 @@
         resultDiv.textContent = '✗ Unable to send message. Please try again later.';
       } finally {
         button.disabled = false;
-        button.textContent = 'Send Message';
+        button.textContent = 'Send to Stage';
       }
     });
 
@@ -422,16 +470,19 @@
         const data = await response.json();
 
         resultDiv.style.display = 'block';
-        if (data.success) {
+        if (response.status === 403) {
+          resultDiv.className = 'error';
+          resultDiv.textContent = '🚫 Sorry, submissions are not currently being accepted. Please check back later!';
+        } else if (data.success) {
           resultDiv.className = 'success';
-          resultDiv.textContent = '✓ Image sent successfully! It will be printed shortly.';
+          resultDiv.textContent = '✓ Image sent to the stage! It will be printed shortly.';
           preview.innerHTML = '';
           imageSubmit.style.display = 'none';
           selectedFile = null;
           imageInput.value = '';
         } else {
           resultDiv.className = 'error';
-          resultDiv.textContent = '✗ ' + (data.message || 'Failed to print image.');
+          resultDiv.textContent = '✗ ' + (data.message || 'Failed to send image.');
         }
       } catch (error) {
         resultDiv.style.display = 'block';
@@ -439,7 +490,7 @@
         resultDiv.textContent = '✗ Unable to send image. Please try again later.';
       } finally {
         imageSubmit.disabled = false;
-        imageSubmit.textContent = 'Send Image';
+        imageSubmit.textContent = 'Send to Stage';
       }
     });
   </script>

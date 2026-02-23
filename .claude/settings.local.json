@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(lsusb:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(curl:*)",
+      "Bash(npm info:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
