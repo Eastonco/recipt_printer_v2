@@ -1,493 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Straight Friends - Live Submissions</title>
+  <title>My Straight Friends – Live Submissions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg:     #2d1b69;
+      --bg2:    #1e1148;
+      --yellow: #f5c842;
+      --purple: #5b3fad;
+      --white:  #ffffff;
+      --dim:    rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --muted:  rgba(255,255,255,0.45);
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(135deg, #e94057 0%, #8a2be2 50%, #ff6b35 100%);
+      background-color: var(--bg);
+      /* Subtle radial spotlight from top center */
+      background-image: radial-gradient(ellipse 80% 50% at 50% -10%, #4a2a99 0%, transparent 70%);
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
       min-height: 100vh;
       display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 40px;
-      padding-bottom: 40px;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 16px 60px;
+      overflow-x: hidden;
     }
 
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(138, 43, 226, 0.4);
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      width: 100vw;
+      overflow: hidden;
+      background: var(--yellow);
+      padding: 6px 0;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 20s linear infinite;
+    }
+
+    .marquee-track span {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: var(--bg2);
+      padding: 0 20px;
+      white-space: nowrap;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 40px 0 24px;
+      max-width: 520px;
       width: 100%;
-      margin: auto 0;
+      animation: fadeup 0.5s ease both;
     }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 15px;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        align-items: flex-start;
-      }
-
-      .container {
-        padding: 25px 20px;
-        margin: 0;
-      }
-
-      h1 {
-        font-size: 26px !important;
-      }
-
-      .subtitle {
-        font-size: 15px !important;
-      }
+    .logo {
+      display: block;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto 8px;
+      filter: drop-shadow(0 6px 30px rgba(245, 200, 66, 0.2));
     }
 
-    h1 {
-      color: #8a2be2;
-      margin: 0 0 8px 0;
-      font-size: 32px;
-      text-align: center;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+    .hero-sub {
+      font-family: 'Permanent Marker', cursive;
+      font-size: clamp(14px, 3.5vw, 18px);
+      color: var(--yellow);
+      margin-top: 6px;
+      transform: rotate(-1.5deg);
+      display: block;
     }
 
-    .subtitle {
-      text-align: center;
-      color: #e94057;
-      margin: 0 0 10px 0;
-      font-size: 17px;
-      font-weight: 600;
-    }
-
-    .tagline {
-      text-align: center;
-      color: #666;
-      margin: 0 0 30px 0;
-      font-size: 14px;
+    .hero-tagline {
+      margin-top: 10px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
       font-style: italic;
+    }
+
+    /* ── SPARKLE decorations ── */
+    .sparkle {
+      display: inline-block;
+      font-size: 18px;
+      animation: pulse 2.5s ease-in-out infinite;
+      vertical-align: middle;
+    }
+    .sparkle:nth-child(2) { animation-delay: 0.8s; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50%       { transform: scale(1.3) rotate(15deg); opacity: 0.7; }
+    }
+
+    /* ── CARD ── */
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--dim);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--yellow);
+      padding: 28px 24px;
+      backdrop-filter: blur(4px);
+      animation: fadeup 0.5s ease 0.12s both;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 11px 8px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+    .tab-btn.active { background: var(--yellow); color: var(--bg2); font-weight: 500; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── FORM ── */
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
     }
 
     textarea {
       width: 100%;
-      min-height: 180px;
-      padding: 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-family: inherit;
+      min-height: 150px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
       font-size: 15px;
+      line-height: 1.6;
+      padding: 14px;
       resize: vertical;
-      transition: border-color 0.3s;
+      transition: border-color 0.2s;
+      border-radius: 0;
     }
 
-    textarea:focus {
-      outline: none;
-      border-color: #e94057;
-    }
+    textarea:focus { outline: none; border-color: var(--yellow); }
+    textarea::placeholder { color: rgba(255,255,255,0.2); }
 
-    button {
-      background: linear-gradient(135deg, #e94057 0%, #8a2be2 50%, #ff6b35 100%);
-      color: white;
-      padding: 15px 32px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 17px;
-      font-weight: 700;
-      margin-top: 15px;
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+    .char-count.warn { color: #ff7070; }
+
+    /* ── BUTTON ── */
+    .submit-btn {
+      display: block;
       width: 100%;
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      margin-top: 18px;
+      padding: 15px;
+      background: var(--yellow);
+      color: var(--bg2);
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(233, 64, 87, 0.4);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    button:disabled {
-      opacity: 0.7;
+    .submit-btn:hover  { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.3); }
+    .submit-btn:active { transform: translate(2px,2px);   box-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
+    .submit-btn:disabled {
+      background: rgba(255,255,255,0.1);
+      color: var(--muted);
+      box-shadow: none;
       cursor: not-allowed;
       transform: none;
     }
 
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 12px;
-      display: none;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 2px solid #c3e6cb;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 2px solid #f5c6cb;
-    }
-
-    .char-count {
-      text-align: right;
-      color: #999;
-      font-size: 13px;
-      margin-top: 5px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 25px;
-    }
-
-    .tab-btn {
-      background: #f5f5f5;
-      border: none;
-      border-radius: 12px 12px 0 0;
-      padding: 12px 24px;
-      cursor: pointer;
-      color: #666;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.3s;
-      margin: 0;
-      width: auto;
-    }
-
-    .tab-btn:hover {
-      background: #ffe5f0;
-      color: #e94057;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, #e94057 0%, #8a2be2 50%, #ff6b35 100%);
-      color: white;
-      box-shadow: 0 2px 8px rgba(233, 64, 87, 0.4);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
+    /* ── UPLOAD ── */
     .upload-area {
-      border: 3px dashed #e0e0e0;
-      border-radius: 12px;
-      padding: 40px;
+      border: 2px dashed var(--border);
+      padding: 44px 24px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s;
-      background: #fafafa;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--bg2);
     }
 
-    .upload-area:hover {
-      border-color: #e94057;
-      background: #fff5f7;
-    }
+    .upload-area:hover,
+    .upload-area.dragover { border-color: var(--yellow); background: rgba(255,255,255,0.04); }
 
-    .upload-area.dragover {
-      border-color: #8a2be2;
-      background: #f5f0ff;
-    }
+    .upload-icon { font-size: 38px; display: block; margin-bottom: 10px; }
+    .upload-area p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .upload-hint  { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 4px; letter-spacing: 1px; }
 
-    .upload-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
+    .preview { margin-top: 18px; text-align: center; }
+    .preview img { max-width: 100%; max-height: 240px; border: 1px solid var(--border); display: block; margin: 0 auto; }
+    .preview-info { margin-top: 8px; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
 
-    .upload-area p {
-      margin: 5px 0;
-      color: #666;
-    }
-
-    .upload-hint {
+    /* ── RESULT ── */
+    #result {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 16px;
       font-size: 13px;
-      color: #999;
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+      border-left: 3px solid;
     }
 
-    .preview {
-      margin-top: 20px;
+    #result.success { background: rgba(245,200,66,0.1); border-color: var(--yellow); color: var(--yellow); }
+    #result.error   { background: rgba(255,80,80,0.08); border-color: #ff7070;       color: #ff9090; }
+
+    /* ── FOOTER ── */
+    .footer-note {
+      margin-top: 28px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
       text-align: center;
     }
 
-    .preview img {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    @keyframes fadeup {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .preview-info {
-      margin-top: 10px;
-      color: #666;
-      font-size: 14px;
-    }
-
-    .show-logo {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 48px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0px);
-      }
-
-      50% {
-        transform: translateY(-10px);
-      }
+    @media (max-width: 480px) {
+      .card { padding: 22px 16px; }
+      .hero { padding: 28px 0 18px; }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="show-logo">🎭</div>
-    <h1>My Straight Friends</h1>
-    <p class="subtitle">Live & Anonoymous Audience Submissions</p>
-    <p class="tagline">Send your questions, comments, or memes to the stage!</p>
 
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="text">Text Message</button>
-      <button class="tab-btn" data-tab="image">Send Image</button>
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <span>MY STRAIGHT FRIENDS</span><span>✦</span>
+      <span>LIVE IN SEATTLE</span><span>✦</span>
+      <span>ANONYMOUS SUBMISSIONS</span><span>✦</span>
+      <span>SEND IT TO THE STAGE</span><span>✦</span>
+      <span>MY STRAIGHT FRIENDS</span><span>✦</span>
+      <span>LIVE IN SEATTLE</span><span>✦</span>
+      <span>ANONYMOUS SUBMISSIONS</span><span>✦</span>
+      <span>SEND IT TO THE STAGE</span><span>✦</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <img src="/msflogo.png" alt="My Straight Friends" class="logo">
+    <span class="hero-sub">
+      <span class="sparkle">✦</span>
+      Live &amp; Anonymous — Send it to the stage
+      <span class="sparkle">✦</span>
+    </span>
+    <p class="hero-tagline">Your message prints directly at the show. No login. No name.</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="text" role="tab" aria-selected="true">Text Message</button>
+      <button class="tab-btn" data-tab="image" role="tab" aria-selected="false">Send Image</button>
     </div>
 
     <div id="text-tab" class="tab-content active">
-      <form id="printForm">
-        <textarea id="textInput" name="text" placeholder="Type your message, question, or comment here..."
-          maxlength="1000"></textarea>
-        <div class="char-count"><span id="charCount">0</span>/1000</div>
-        <button type="submit">Send to Stage</button>
+      <form id="printForm" novalidate>
+        <label for="textInput">Your message</label>
+        <textarea id="textInput" name="text" placeholder="Ask something embarrassing. Share a hot take. Say hi to the hosts." maxlength="1000"></textarea>
+        <div class="char-count"><span id="charCount">0</span> / 1000</div>
+        <button type="submit" class="submit-btn">Send to Stage</button>
       </form>
     </div>
 
     <div id="image-tab" class="tab-content">
-      <form id="imageForm">
-        <div class="upload-area" id="uploadArea">
-          <div class="upload-icon">📸</div>
-          <p>Click to select an image or drag and drop</p>
-          <p class="upload-hint">PNG, JPG, GIF (Max 5MB)</p>
+      <form id="imageForm" novalidate>
+        <label>Your image</label>
+        <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Click to upload image">
+          <span class="upload-icon">📸</span>
+          <p>Click to select or drag &amp; drop</p>
+          <p class="upload-hint">PNG · JPG · GIF &nbsp;|&nbsp; Max 5MB</p>
           <input type="file" id="imageInput" accept="image/*" hidden>
         </div>
         <div id="preview" class="preview"></div>
-        <button type="submit" id="imageSubmit" style="display:none;">Send to Stage</button>
+        <button type="submit" class="submit-btn" id="imageSubmit" style="display:none;">Send to Stage</button>
       </form>
     </div>
 
-    <div id="result"></div>
+    <div id="result" role="alert"></div>
   </div>
 
+  <p class="footer-note">mystraightfriends.com &nbsp;·&nbsp; Seattle, WA</p>
+
   <script>
-    const textarea = document.getElementById('textInput');
+    const textarea  = document.getElementById('textInput');
     const charCount = document.getElementById('charCount');
     const resultDiv = document.getElementById('result');
 
-    // Tab switching
+    // ── Tabs ──
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const tabName = btn.dataset.tab;
-
-        // Update active states
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
         btn.classList.add('active');
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-
-        // Clear result when switching tabs
-        resultDiv.style.display = 'none';
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById(`${tab}-tab`).classList.add('active');
+        hideResult();
       });
     });
 
-    // Text message handling
-    function updateCharCount() {
-      charCount.textContent = textarea.value.length;
+    // ── Char counter ──
+    textarea.addEventListener('input', () => {
+      const len = textarea.value.length;
+      charCount.textContent = len;
+      charCount.parentElement.classList.toggle('warn', len > 900);
+    });
+
+    function showResult(type, msg) {
+      resultDiv.className = type;
+      resultDiv.textContent = msg;
+      resultDiv.style.display = 'block';
     }
 
-    textarea.addEventListener('input', updateCharCount);
-    updateCharCount();
+    function hideResult() { resultDiv.style.display = 'none'; }
 
+    // ── Text form ──
     document.getElementById('printForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const text = textarea.value.trim();
+      const btn  = e.target.querySelector('.submit-btn');
+      if (!text) { showResult('error', 'Type something first!'); return; }
 
-      const text = textarea.value;
-      const button = e.target.querySelector('button');
-
-      if (!text.trim()) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = 'Please enter a message first!';
-        return;
-      }
-
-      button.disabled = true;
-      button.textContent = 'Sending...';
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      hideResult();
 
       try {
-        const response = await fetch('/print', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ text })
-        });
-
-        const data = await response.json();
-
-        resultDiv.style.display = 'block';
-        if (response.status === 403) {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '🚫 Sorry, submissions are not currently being accepted. Please check back later!';
+        const res  = await fetch('/print', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+        const data = await res.json();
+        if (res.status === 403) {
+          showResult('error', '🚫 Submissions are closed right now — sit tight!');
         } else if (data.success) {
-          resultDiv.className = 'success';
-          resultDiv.textContent = '✓ Sent to the stage! The hosts will see it shortly.';
+          showResult('success', '✦ Sent!');
           textarea.value = '';
-          updateCharCount();
+          charCount.textContent = '0';
         } else {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '✗ Oops! Something went wrong. Please try again.';
+          showResult('error', 'Something went wrong — try again.');
         }
-      } catch (error) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = '✗ Unable to send message. Please try again later.';
+      } catch {
+        showResult('error', 'Couldn\'t reach the server. Try again.');
       } finally {
-        button.disabled = false;
-        button.textContent = 'Send to Stage';
+        btn.disabled = false;
+        btn.textContent = 'Send to Stage';
       }
     });
 
-    // Image upload handling
-    const uploadArea = document.getElementById('uploadArea');
-    const imageInput = document.getElementById('imageInput');
-    const preview = document.getElementById('preview');
+    // ── Image upload ──
+    const uploadArea  = document.getElementById('uploadArea');
+    const imageInput  = document.getElementById('imageInput');
+    const preview     = document.getElementById('preview');
     const imageSubmit = document.getElementById('imageSubmit');
-    let selectedFile = null;
+    let selectedFile  = null;
 
-    uploadArea.addEventListener('click', () => imageInput.click());
+    uploadArea.addEventListener('click',  () => imageInput.click());
+    uploadArea.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') imageInput.click(); });
+    imageInput.addEventListener('change',  e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-    imageInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        handleFile(file);
-      }
-    });
-
-    // Drag and drop
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
+    uploadArea.addEventListener('dragover',  e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', ()  => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
       e.preventDefault();
       uploadArea.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        handleFile(file);
-      }
+      if (file && file.type.startsWith('image/')) handleFile(file);
     });
 
     function handleFile(file) {
-      if (file.size > 5 * 1024 * 1024) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = 'File is too large. Maximum size is 5MB.';
-        return;
-      }
-
+      if (file.size > 5 * 1024 * 1024) { showResult('error', 'File too large — max 5MB.'); return; }
       selectedFile = file;
       const reader = new FileReader();
-
-      reader.onload = (e) => {
-        preview.innerHTML = `
-          <img src="${e.target.result}" alt="Preview">
-          <div class="preview-info">${file.name} (${(file.size / 1024).toFixed(1)} KB)</div>
-        `;
+      reader.onload = ev => {
+        preview.innerHTML = `<img src="${ev.target.result}" alt="Preview"><div class="preview-info">${file.name} — ${(file.size / 1024).toFixed(1)} KB</div>`;
         imageSubmit.style.display = 'block';
       };
-
       reader.readAsDataURL(file);
     }
 
     document.getElementById('imageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      if (!selectedFile) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = 'Please select an image first!';
-        return;
-      }
+      if (!selectedFile) { showResult('error', 'Pick an image first!'); return; }
 
       imageSubmit.disabled = true;
       imageSubmit.textContent = 'Sending...';
+      hideResult();
 
       try {
         const formData = new FormData();
         formData.append('image', selectedFile);
-
-        const response = await fetch('/print-image', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-
-        resultDiv.style.display = 'block';
-        if (response.status === 403) {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '🚫 Sorry, submissions are not currently being accepted. Please check back later!';
+        const res  = await fetch('/print-image', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (res.status === 403) {
+          showResult('error', '🚫 Submissions are closed right now — sit tight!');
         } else if (data.success) {
-          resultDiv.className = 'success';
-          resultDiv.textContent = '✓ Image sent to the stage! It will be printed shortly.';
+          showResult('success', '✦ Image sent!');
           preview.innerHTML = '';
           imageSubmit.style.display = 'none';
           selectedFile = null;
           imageInput.value = '';
         } else {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '✗ ' + (data.message || 'Failed to send image.');
+          showResult('error', data.message || 'Failed to send image.');
         }
-      } catch (error) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = '✗ Unable to send image. Please try again later.';
+      } catch {
+        showResult('error', 'Couldn\'t reach the server. Try again.');
       } finally {
         imageSubmit.disabled = false;
         imageSubmit.textContent = 'Send to Stage';
@@ -495,5 +464,4 @@
     });
   </script>
 </body>
-
 </html>

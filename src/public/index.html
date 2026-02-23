@@ -1,460 +1,700 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Send Me a Message</title>
+  <title>Send Connor a Message</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Special+Elite&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --paper:   #faf6ef;
+      --paper2:  #f2ead8;
+      --ink:     #2c2416;
+      --faded:   #8a7a5c;
+      --red:     #c0392b;
+      --teal:    #2a7c6f;
+      --rule:    rgba(44, 36, 22, 0.1);
+      --shadow:  rgba(44, 36, 22, 0.15);
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-color: #e8dfc8;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(180,160,120,0.3) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(200,180,140,0.2) 0%, transparent 50%);
+      font-family: 'Lora', serif;
       min-height: 100vh;
       display: flex;
-      align-items: flex-start;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      padding-top: 40px;
-      padding-bottom: 40px;
+      padding: 40px 16px;
     }
 
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    /* ── PAPER CARD ── */
+    .paper {
       width: 100%;
-      margin: auto 0;
+      max-width: 480px;
+      background: var(--paper);
+      padding: 48px 44px 44px;
+      position: relative;
+      box-shadow:
+        0 1px 1px var(--shadow),
+        0 4px 8px var(--shadow),
+        0 16px 40px rgba(44,36,22,0.12),
+        inset 0 0 60px rgba(180,160,120,0.08);
+      animation: unfold 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 15px;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        align-items: flex-start;
-      }
+    /* Ruled lines scoped to textarea wrapper */
+    .ruled {
+      position: relative;
+    }
 
-      .container {
-        padding: 25px 20px;
-        margin: 0;
-      }
+    .ruled::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* font-size 16px, line-height 2 = 32px per line.
+         textarea padding-top is 4px, so first baseline lands at ~28px.
+         We draw the line at 28px then repeat every 32px. */
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 27px,
+        var(--rule) 27px,
+        var(--rule) 28px
+      );
+      background-size: 100% 32px;
+      background-position: 0 4px;
+      pointer-events: none;
+    }
 
-      h1 {
-        font-size: 24px;
-      }
+    /* Red margin line */
+    .paper::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 68px;
+      width: 1px;
+      background: rgba(192, 57, 43, 0.2);
+      pointer-events: none;
+    }
+
+    /* Top tape strip */
+    .tape {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-1deg);
+      width: 80px;
+      height: 28px;
+      background: rgba(255, 240, 180, 0.75);
+      border: 1px solid rgba(200,180,100,0.4);
+      backdrop-filter: blur(2px);
+    }
+
+    /* Fold crease in top-right corner */
+    .fold {
+      position: absolute;
+      top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 32px 32px 0;
+      border-color: transparent #e8dfc8 transparent transparent;
+      filter: drop-shadow(-2px 2px 2px var(--shadow));
+    }
+
+    @keyframes unfold {
+      from { opacity: 0; transform: translateY(20px) rotate(-0.5deg); }
+      to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+    }
+
+    @keyframes tear {
+      0%   { transform: rotate(0deg) translateY(0); }
+      20%  { transform: rotate(-1.5deg) translateY(-3px); }
+      40%  { transform: rotate(1deg) translateY(2px); }
+      60%  { transform: rotate(-0.5deg) translateY(-1px); }
+      80%  { transform: rotate(0.5deg) translateY(1px); }
+      100% { transform: rotate(0deg) translateY(0); }
+    }
+
+    .tearing { animation: tear 0.4s ease both; }
+
+    /* ── DOODLE CANVAS ── */
+    #doodle {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      width: 48px;
+      height: 48px;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ── KONAMI ── */
+    .konami-msg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(16px, 3.5vw, 24px);
+      color: var(--teal);
+      background: var(--paper);
+      padding: 24px 36px;
+      box-shadow: 0 8px 32px rgba(44,36,22,0.2), 4px 4px 0 rgba(44,36,22,0.12);
+      text-align: center;
+      z-index: 1000;
+      pointer-events: none;
+      max-width: 90vw;
+      line-height: 1.6;
+      animation: konamiPop 3s ease both;
+    }
+
+    @keyframes konamiPop {
+      0%   { opacity: 0; transform: translate(-50%, -46%); }
+      15%  { opacity: 1; transform: translate(-50%, -51%); }
+      80%  { opacity: 1; transform: translate(-50%, -50%); }
+      100% { opacity: 0; transform: translate(-50%, -54%); }
+    }
+
+    /* ── HEADER ── */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .printer-icon {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 10px;
+      animation: wiggle 4s ease-in-out infinite;
+    }
+
+    @keyframes wiggle {
+      0%, 90%, 100% { transform: rotate(0deg); }
+      93%            { transform: rotate(-6deg); }
+      96%            { transform: rotate(4deg); }
     }
 
     h1 {
-      color: #333;
-      margin: 0 0 10px 0;
-      font-size: 28px;
-      text-align: center;
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(22px, 5vw, 28px);
+      color: var(--ink);
+      letter-spacing: 1px;
+      line-height: 1.2;
     }
 
     .subtitle {
-      text-align: center;
-      color: #666;
-      margin: 0 0 30px 0;
-      font-size: 16px;
+      font-family: 'Caveat', cursive;
+      font-size: 17px;
+      color: var(--faded);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--rule);
+      position: relative;
+      z-index: 1;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      font-family: 'Caveat', cursive;
+      font-size: 17px;
+      color: var(--faded);
+      padding: 8px 20px 10px;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 2px;
+      background: var(--teal);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active { color: var(--teal); }
+    .tab-btn.active::after { transform: scaleX(1); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── TEXTAREA ── */
+    .field-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--faded);
+      margin-bottom: 8px;
+      display: block;
+      position: relative;
+      z-index: 1;
     }
 
     textarea {
       width: 100%;
-      min-height: 180px;
-      padding: 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 15px;
-      resize: vertical;
-      transition: border-color 0.3s;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 14px 32px;
+      min-height: 160px;
+      background: transparent;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      border-bottom: 1px dashed rgba(44,36,22,0.2);
+      color: var(--ink);
+      font-family: 'Lora', serif;
       font-size: 16px;
-      font-weight: 600;
-      margin-top: 15px;
-      width: 100%;
-      transition: transform 0.2s, box-shadow 0.2s;
+      line-height: 2;
+      padding: 4px 0 4px 4px;
+      resize: none;
+      position: relative;
+      z-index: 1;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      display: none;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 2px solid #c3e6cb;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 2px solid #f5c6cb;
-    }
+    textarea:focus { outline: none; border-bottom-color: var(--teal); }
+    textarea::placeholder { color: rgba(44,36,22,0.25); font-style: italic; }
 
     .char-count {
+      font-family: 'Caveat', cursive;
+      font-size: 14px;
+      color: var(--faded);
       text-align: right;
-      color: #999;
-      font-size: 13px;
-      margin-top: 5px;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
     }
+    .char-count.warn { color: var(--red); }
 
-    .tabs {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 25px;
-    }
-
-    .tab-btn {
-      background: #f5f5f5;
-      border: none;
-      border-radius: 8px 8px 0 0;
-      padding: 12px 24px;
-      cursor: pointer;
-      color: #666;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.3s;
-      margin: 0;
-      width: auto;
-    }
-
-    .tab-btn:hover {
-      background: #e8ecff;
-      color: #667eea;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
+    /* ── BUTTON ── */
+    .send-btn {
       display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: var(--teal);
+      color: var(--paper);
+      border: none;
+      font-family: 'Special Elite', cursive;
+      font-size: 17px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.1s;
+      box-shadow: 3px 3px 0 rgba(44,36,22,0.2);
     }
 
+    .send-btn:hover  { background: #236358; transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(44,36,22,0.2); }
+    .send-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 rgba(44,36,22,0.2); }
+    .send-btn:disabled {
+      background: var(--paper2);
+      color: var(--faded);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── UPLOAD ── */
     .upload-area {
-      border: 3px dashed #e0e0e0;
-      border-radius: 8px;
-      padding: 40px;
+      border: 2px dashed rgba(44,36,22,0.2);
+      padding: 40px 24px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s;
-      background: #fafafa;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.3);
     }
 
-    .upload-area:hover {
-      border-color: #667eea;
-      background: #f5f7ff;
-    }
+    .upload-area:hover,
+    .upload-area.dragover { border-color: var(--teal); background: rgba(42,124,111,0.04); }
 
-    .upload-area.dragover {
-      border-color: #667eea;
-      background: #e8ecff;
-    }
-
-    .upload-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
+    .upload-icon { font-size: 36px; display: block; margin-bottom: 10px; }
 
     .upload-area p {
-      margin: 5px 0;
-      color: #666;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--faded);
+      line-height: 1.6;
     }
 
     .upload-hint {
-      font-size: 13px;
-      color: #999;
+      font-family: 'Special Elite', cursive;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: rgba(44,36,22,0.3);
+      margin-top: 6px;
     }
 
-    .preview {
-      margin-top: 20px;
-      text-align: center;
-    }
-
+    .preview { margin-top: 16px; text-align: center; position: relative; z-index: 1; }
     .preview img {
       max-width: 100%;
-      max-height: 300px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-height: 220px;
+      box-shadow: 0 4px 16px var(--shadow);
+      display: block;
+      margin: 0 auto;
+    }
+    .preview-info {
+      font-family: 'Caveat', cursive;
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--faded);
     }
 
-    .preview-info {
-      margin-top: 10px;
-      color: #666;
-      font-size: 14px;
+    /* ── RESULT ── */
+    #result {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 16px;
+      font-family: 'Caveat', cursive;
+      font-size: 17px;
+      position: relative;
+      z-index: 1;
+      line-height: 1.5;
+    }
+
+    #result.success {
+      background: rgba(42,124,111,0.08);
+      border-left: 3px solid var(--teal);
+      color: var(--teal);
+    }
+
+    #result.error {
+      background: rgba(192,57,43,0.07);
+      border-left: 3px solid var(--red);
+      color: var(--red);
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 20px;
+      font-family: 'Caveat', cursive;
+      font-size: 13px;
+      color: rgba(44,36,22,0.35);
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      .paper { padding: 44px 24px 32px; }
+      .paper::after { left: 48px; }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>📝 Send Me a Message</h1>
-    <p class="subtitle">Your message will be physically printed out from a recipt printer on my desk</p>
 
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="text">Text Message</button>
-      <button class="tab-btn" data-tab="image">Send Image</button>
+  <div class="paper">
+    <div class="tape"></div>
+    <div class="fold"></div>
+
+    <div class="header">
+      <span class="printer-icon">🖨️</span>
+      <h1>Send me a message</h1>
+      <p class="subtitle">It'll print out on my desk ✦</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="text" role="tab" aria-selected="true">Write a note</button>
+      <button class="tab-btn" data-tab="image" role="tab" aria-selected="false">Send a picture</button>
     </div>
 
     <div id="text-tab" class="tab-content active">
-      <form id="printForm">
-        <textarea id="textInput" name="text" placeholder="Type your message here..." maxlength="1000"></textarea>
-        <div class="char-count"><span id="charCount">0</span>/1000</div>
-        <button type="submit">Send Message</button>
+      <form id="printForm" novalidate>
+        <label class="field-label" for="textInput">Your message</label>
+        <div class="ruled">
+        <textarea id="textInput" name="text" placeholder="Say anything — I'll see it in a moment..." maxlength="1000"></textarea>
+        </div>
+        <div class="char-count"><span id="charCount">0</span> / 1000</div>
+        <button type="submit" class="send-btn">Send the Note</button>
       </form>
     </div>
 
     <div id="image-tab" class="tab-content">
-      <form id="imageForm">
-        <div class="upload-area" id="uploadArea">
-          <div class="upload-icon">🖼️</div>
-          <p>Click to select an image or drag and drop</p>
-          <p class="upload-hint">PNG, JPG, GIF (Max 5MB)</p>
+      <form id="imageForm" novalidate>
+        <label class="field-label">Your image</label>
+        <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Click to upload image">
+          <span class="upload-icon">🖼️</span>
+          <p>Click to choose or drag &amp; drop an image</p>
+          <p class="upload-hint">PNG · JPG · GIF &nbsp;|&nbsp; Max 5MB</p>
           <input type="file" id="imageInput" accept="image/*" hidden>
         </div>
         <div id="preview" class="preview"></div>
-        <button type="submit" id="imageSubmit" style="display:none;">Send Image</button>
+        <button type="submit" class="send-btn" id="imageSubmit" style="display:none;">Send the Picture</button>
       </form>
     </div>
 
-    <div id="result"></div>
+    <div id="result" role="alert"></div>
+
+    <p class="footer">printer.eastonco.net · Connor's receipt printer</p>
+    <canvas id="doodle" width="48" height="48" aria-hidden="true"></canvas>
   </div>
 
   <script>
-    const textarea = document.getElementById('textInput');
+    const textarea  = document.getElementById('textInput');
     const charCount = document.getElementById('charCount');
     const resultDiv = document.getElementById('result');
+    const paper     = document.querySelector('.paper');
 
-    // Tab switching
+    // ── Rotating placeholders ──
+    const placeholders = [
+      "Say anything — I'll see it in a moment...",
+      "Tell me something good.",
+      "What's on your mind?",
+      "Leave a note. I'll find it.",
+      "Go ahead, be weird about it.",
+      "A kind word? A hot take? Both?",
+      "Type something. It'll appear on my desk.",
+      "I accept complaints, compliments, and chaos.",
+    ];
+    let phIdx = 0;
+    setInterval(() => {
+      if (document.activeElement !== textarea && !textarea.value) {
+        phIdx = (phIdx + 1) % placeholders.length;
+        textarea.placeholder = placeholders[phIdx];
+      }
+    }, 3500);
+
+    // ── Tear animation on success ──
+    function tearEffect() {
+      paper.classList.remove('tearing');
+      void paper.offsetWidth; // reflow to restart
+      paper.classList.add('tearing');
+      paper.addEventListener('animationend', () => paper.classList.remove('tearing'), { once: true });
+    }
+
+    // ── Idle doodle ──
+    const doodle = document.getElementById('doodle');
+    const dCtx   = doodle.getContext('2d');
+    let idleTimer;
+
+    function drawStar(cx, cy, r, points, color) {
+      dCtx.clearRect(0, 0, 48, 48);
+      dCtx.strokeStyle = color;
+      dCtx.lineWidth = 1.5;
+      dCtx.lineCap = 'round';
+      const step = Math.PI / points;
+      const totalFrames = points * 2;
+      // Build all vertex positions upfront
+      const verts = [];
+      for (let i = 0; i <= totalFrames; i++) {
+        const angle  = i * step - Math.PI / 2;
+        const radius = i % 2 === 0 ? r : r * 0.45;
+        verts.push([cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius]);
+      }
+      let seg = 0; // which segment we're on
+      let t   = 0; // progress along current segment (0–1)
+      const MS_PER_SEG = 320; // ms per segment — higher = slower draw
+      let last = null;
+
+      function tick(now) {
+        if (!last) last = now;
+        const dt = now - last;
+        last = now;
+        t += dt / MS_PER_SEG;
+        while (t >= 1 && seg < verts.length - 1) { t -= 1; seg++; }
+        if (seg >= verts.length - 1) { t = 1; }
+
+        dCtx.clearRect(0, 0, 48, 48);
+        dCtx.beginPath();
+        dCtx.moveTo(verts[0][0], verts[0][1]);
+        for (let i = 1; i < seg; i++) dCtx.lineTo(verts[i][0], verts[i][1]);
+        // Interpolate the tip of the current segment
+        const x = verts[seg][0] + (verts[Math.min(seg+1, verts.length-1)][0] - verts[seg][0]) * t;
+        const y = verts[seg][1] + (verts[Math.min(seg+1, verts.length-1)][1] - verts[seg][1]) * t;
+        dCtx.lineTo(x, y);
+        dCtx.stroke();
+
+        if (seg < verts.length - 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function startIdleDoodle() {
+      idleTimer = setTimeout(() => {
+        doodle.style.opacity = '1';
+        drawStar(24, 24, 18, 5, 'rgba(42,124,111,0.35)');
+      }, 10000);
+    }
+
+    function resetIdleDoodle() {
+      clearTimeout(idleTimer);
+      doodle.style.opacity = '0';
+      dCtx.clearRect(0, 0, 48, 48);
+      startIdleDoodle();
+    }
+
+    document.addEventListener('mousemove', resetIdleDoodle);
+    document.addEventListener('keydown',   resetIdleDoodle);
+    startIdleDoodle();
+
+    // ── Konami code ──
+    const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let konamiIdx = 0;
+    const konamiFacts = [
+      "🖨️ Fun fact: this printer has no idea it's famous.",
+      "📝 Connor reads every single one of these.",
+      "🎉 You found it. There's no prize. Just vibes.",
+      "🧾 Receipt printers: surprisingly wholesome since 2024.",
+    ];
+    document.addEventListener('keydown', e => {
+      if (e.key === KONAMI[konamiIdx]) {
+        konamiIdx++;
+        if (konamiIdx === KONAMI.length) {
+          konamiIdx = 0;
+          const msg = document.createElement('div');
+          msg.className = 'konami-msg';
+          msg.textContent = konamiFacts[Math.floor(Math.random() * konamiFacts.length)];
+          document.body.appendChild(msg);
+          msg.addEventListener('animationend', () => msg.remove());
+        }
+      } else {
+        konamiIdx = 0;
+      }
+    });
+
+    // ── Tabs ──
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const tabName = btn.dataset.tab;
-
-        // Update active states
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
         btn.classList.add('active');
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-
-        // Clear result when switching tabs
-        resultDiv.style.display = 'none';
+        btn.setAttribute('aria-selected','true');
+        document.getElementById(`${tab}-tab`).classList.add('active');
+        hideResult();
       });
     });
 
-    // Text message handling
-    function updateCharCount() {
-      charCount.textContent = textarea.value.length;
+    // ── Char counter ──
+    textarea.addEventListener('input', () => {
+      const len = textarea.value.length;
+      charCount.textContent = len;
+      charCount.parentElement.classList.toggle('warn', len > 900);
+    });
+
+    function showResult(type, msg) {
+      resultDiv.className = type;
+      resultDiv.textContent = msg;
+      resultDiv.style.display = 'block';
     }
 
-    textarea.addEventListener('input', updateCharCount);
-    updateCharCount();
+    function hideResult() { resultDiv.style.display = 'none'; }
 
+    // ── Text form ──
     document.getElementById('printForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const text = textarea.value.trim();
+      const btn  = e.target.querySelector('.send-btn');
+      if (!text) { showResult('error', 'Write something first!'); return; }
 
-      const text = textarea.value;
-      const button = e.target.querySelector('button');
-
-      if (!text.trim()) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = 'Please enter a message first!';
-        return;
-      }
-
-      button.disabled = true;
-      button.textContent = 'Sending...';
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      hideResult();
 
       try {
-        const response = await fetch('/print', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ text })
-        });
-
-        const data = await response.json();
-
-        console.log('Text print - Response status:', response.status);
-        console.log('Text print - Response data:', data);
-
-        resultDiv.style.display = 'block';
-        if (response.status === 403) {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '🚫 Sorry, submissions are not currently being accepted. Please check back later!';
+        const res  = await fetch('/print', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+        const data = await res.json();
+        if (res.status === 403) {
+          showResult('error', "Connor's not accepting messages right now — try again later!");
         } else if (data.success) {
-          resultDiv.className = 'success';
-          resultDiv.textContent = '✓ Message sent successfully! It will be received shortly.';
+          tearEffect();
+          showResult('success', "✓ Sent! It's printing on my desk right now. Literally it's already printed. Done. Just like that.");
           textarea.value = '';
-          updateCharCount();
+          charCount.textContent = '0';
         } else {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '✗ Oops! Something went wrong. Please try again.';
+          showResult('error', 'Something went wrong — give it another try.');
         }
-      } catch (error) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = '✗ Unable to send message. Please try again later.';
+      } catch {
+        showResult('error', "Couldn't reach the printer. Try again in a moment.");
       } finally {
-        button.disabled = false;
-        button.textContent = 'Send Message';
+        btn.disabled = false;
+        btn.textContent = 'Send the Note';
       }
     });
 
-    // Image upload handling
-    const uploadArea = document.getElementById('uploadArea');
-    const imageInput = document.getElementById('imageInput');
-    const preview = document.getElementById('preview');
+    // ── Image upload ──
+    const uploadArea  = document.getElementById('uploadArea');
+    const imageInput  = document.getElementById('imageInput');
+    const preview     = document.getElementById('preview');
     const imageSubmit = document.getElementById('imageSubmit');
-    let selectedFile = null;
+    let selectedFile  = null;
 
-    uploadArea.addEventListener('click', () => imageInput.click());
+    uploadArea.addEventListener('click',  () => imageInput.click());
+    uploadArea.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') imageInput.click(); });
+    imageInput.addEventListener('change',  e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-    imageInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        handleFile(file);
-      }
-    });
-
-    // Drag and drop
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
+    uploadArea.addEventListener('dragover',  e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', ()  => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
       e.preventDefault();
       uploadArea.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        handleFile(file);
-      }
+      if (file && file.type.startsWith('image/')) handleFile(file);
     });
 
     function handleFile(file) {
-      if (file.size > 5 * 1024 * 1024) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = 'File is too large. Maximum size is 5MB.';
-        return;
-      }
-
+      if (file.size > 5 * 1024 * 1024) { showResult('error', 'File too large — max 5MB.'); return; }
       selectedFile = file;
       const reader = new FileReader();
-
-      reader.onload = (e) => {
-        preview.innerHTML = `
-          <img src="${e.target.result}" alt="Preview">
-          <div class="preview-info">${file.name} (${(file.size / 1024).toFixed(1)} KB)</div>
-        `;
+      reader.onload = ev => {
+        preview.innerHTML = `<img src="${ev.target.result}" alt="Preview"><div class="preview-info">${file.name} — ${(file.size / 1024).toFixed(1)} KB</div>`;
         imageSubmit.style.display = 'block';
       };
-
       reader.readAsDataURL(file);
     }
 
     document.getElementById('imageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      if (!selectedFile) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = 'Please select an image first!';
-        return;
-      }
+      if (!selectedFile) { showResult('error', 'Pick an image first!'); return; }
 
       imageSubmit.disabled = true;
       imageSubmit.textContent = 'Sending...';
+      hideResult();
 
       try {
         const formData = new FormData();
         formData.append('image', selectedFile);
-
-        const response = await fetch('/print-image', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-
-        console.log('Image print - Response status:', response.status);
-        console.log('Image print - Response data:', data);
-
-        resultDiv.style.display = 'block';
-        if (response.status === 403) {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '🚫 Sorry, submissions are not currently being accepted. Please check back later!';
+        const res  = await fetch('/print-image', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (res.status === 403) {
+          showResult('error', "Connor's not accepting messages right now — try again later!");
         } else if (data.success) {
-          resultDiv.className = 'success';
-          resultDiv.textContent = '✓ Image sent successfully! It will be printed shortly.';
+          tearEffect();
+          showResult('success', "✓ Picture sent! It's printing out on Connor's desk right now.");
           preview.innerHTML = '';
           imageSubmit.style.display = 'none';
           selectedFile = null;
           imageInput.value = '';
         } else {
-          resultDiv.className = 'error';
-          resultDiv.textContent = '✗ ' + (data.message || 'Failed to print image.');
+          showResult('error', data.message || 'Failed to send — try again.');
         }
-      } catch (error) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'error';
-        resultDiv.textContent = '✗ Unable to send image. Please try again later.';
+      } catch {
+        showResult('error', "Couldn't reach the printer. Try again in a moment.");
       } finally {
         imageSubmit.disabled = false;
-        imageSubmit.textContent = 'Send Image';
+        imageSubmit.textContent = 'Send the Picture';
       }
     });
   </script>
 </body>
-
 </html>
