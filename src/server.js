@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const multer = require('multer');
 const sharp = require('sharp');
@@ -6,6 +7,21 @@ const dither = require('floyd-steinberg');
 const { PNG } = require('pngjs');
 const ThermalPrinter = require('node-thermal-printer').printer;
 const printerConfig = require('./printer-config');
+
+const logsDir = path.join(__dirname, '..', 'logs');
+const sessionTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
+const IMAGES_DIR = path.join(logsDir, sessionTimestamp, 'images');
+fs.mkdirSync(IMAGES_DIR, { recursive: true });
+const LOG_FILE = path.join(logsDir, sessionTimestamp, 'events.log');
+
+function log(level, msg) {
+  console.log(`[${new Date().toISOString()}] ${level.padEnd(5)} ${msg}`);
+}
+
+function logEvent(type, detail) {
+  const line = `[${new Date().toISOString()}] ${type}: ${detail}\n`;
+  fs.appendFileSync(LOG_FILE, line);
+}
 
 const app = express();
 const PORT = 3000;
@@ -26,12 +42,12 @@ async function processQueue() {
   isPrinting = true;
 
   const job = printQueue.shift();
-  console.log(`[${new Date().toISOString()}] Processing print job (${printQueue.length} remaining in queue)`);
+  log('QUEUE', `Processing job (${printQueue.length} remaining)`);
 
   try {
     await job();
   } catch (err) {
-    console.error('Queue job error:', err);
+    log('ERROR', `Queue job error: ${err.message}`);
   }
 
   isPrinting = false;
@@ -61,12 +77,13 @@ function addHeader(printer, title) {
   printer.newLine();
 }
 
-function addFooter(printer) {
+function addFooter(printer, domain) {
   printer.drawLine();
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US');
   const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
   printer.println(`Date: ${dateStr} ${timeStr}`);
+  if (domain) printer.println(`From: ${domain}`);
   printer.drawLine();
   printer.cut();
 }
@@ -101,25 +118,25 @@ async function processImageForPrinter(imageBuffer) {
 
 // --- Print jobs ---
 
-async function printTextReceipt(text) {
+async function printTextReceipt(text, domain) {
   const printer = new ThermalPrinter(printerConfig);
   addHeader(printer, 'RECEIPT');
   printer.alignLeft();
   printer.println(text);
   printer.newLine();
-  addFooter(printer);
+  addFooter(printer, domain);
   await printer.execute();
-  console.log('Receipt printed successfully');
+  log('PRINT', 'Text receipt printed');
 }
 
-async function printImageReceipt(processedImage) {
+async function printImageReceipt(processedImage, domain) {
   const printer = new ThermalPrinter(printerConfig);
   addHeader(printer, 'IMAGE PRINT');
   await printer.printImageBuffer(processedImage);
   printer.newLine();
-  addFooter(printer);
+  addFooter(printer, domain);
   await printer.execute();
-  console.log('Image printed successfully');
+  log('PRINT', 'Image receipt printed');
 }
 
 // --- Middleware ---
@@ -173,10 +190,11 @@ app.post('/print', requireAcceptance, (req, res) => {
     });
   }
 
-  console.log(`[${new Date().toISOString()}] Print request received (queue length: ${printQueue.length})`);
-  console.log('Text:', text);
+  const domain = req.get('host') || '';
+  log('RECV', `Text from ${domain} (queue: ${printQueue.length})`);
 
-  enqueue(() => printTextReceipt(text));
+  logEvent('TEXT', text);
+  enqueue(() => printTextReceipt(text, domain));
   res.json({ success: true, message: 'Receipt added to print queue' });
 });
 
@@ -190,15 +208,21 @@ app.post('/print-image', requireAcceptance, upload.single('image'), async (req, 
       });
     }
 
-    console.log(`[${new Date().toISOString()}] Image print request received`);
-    console.log('File:', req.file.originalname, 'Size:', req.file.size, 'bytes');
+    const domain = req.get('host') || '';
+    log('RECV', `Image "${req.file.originalname}" (${req.file.size} bytes) from ${domain}`);
+
+    const ext = path.extname(req.file.originalname) || '.jpg';
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const savedFilename = `${timestamp}${ext}`;
+    fs.writeFileSync(path.join(IMAGES_DIR, savedFilename), req.file.buffer);
+    logEvent('IMAGE', savedFilename);
 
     const processedImage = await processImageForPrinter(req.file.buffer);
 
-    enqueue(() => printImageReceipt(processedImage));
+    enqueue(() => printImageReceipt(processedImage, domain));
     res.json({ success: true, message: 'Image added to print queue' });
   } catch (error) {
-    console.error('Image print error:', error);
+    log('ERROR', `Image print failed: ${error.message}`);
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to queue image',
@@ -237,7 +261,7 @@ app.post('/admin/toggle', (req, res) => {
   }
 
   receiptAcceptanceEnabled = enabled;
-  console.log(`[${new Date().toISOString()}] Receipt acceptance ${enabled ? 'ENABLED' : 'DISABLED'}`);
+  log('ADMIN', `Receipt acceptance ${enabled ? 'ENABLED' : 'DISABLED'}`);
 
   res.json({ success: true, enabled: receiptAcceptanceEnabled });
 });
@@ -245,12 +269,7 @@ app.post('/admin/toggle', (req, res) => {
 // --- Start server ---
 
 app.listen(PORT, () => {
-  console.log('=================================');
-  console.log('Receipt Printer Service Started');
-  console.log('=================================');
-  console.log(`Server running on: http://localhost:${PORT}`);
-  console.log(`Printer: Epson M244A (${printerConfig.interface})`);
-  console.log('=================================');
-  console.log('Ready to print receipts!');
-  console.log('');
+  log('START', `Receipt printer service on http://localhost:${PORT}`);
+  log('START', `Printer: Epson M244A (${printerConfig.interface})`);
+  log('START', `Session log: logs/${sessionTimestamp}/`);
 });
