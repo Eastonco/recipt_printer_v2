@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node src/server.js",
     "tiktok": "node src/tiktok-live.js",
+    "stress": "node stress-test.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
